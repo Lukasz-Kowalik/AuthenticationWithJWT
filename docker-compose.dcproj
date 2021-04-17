@@ -5,8 +5,7 @@
     <DockerTargetOS>Linux</DockerTargetOS>
     <ProjectGuid>e2daf16f-13a3-466c-924a-52689408d665</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
-    <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
-    <DockerServiceName>backend</DockerServiceName>
+    <DockerServiceUrl>http://localhost:8081</DockerServiceUrl>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.yml" />
