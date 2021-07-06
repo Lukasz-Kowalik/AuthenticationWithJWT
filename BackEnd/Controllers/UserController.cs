@@ -1,9 +1,10 @@
-﻿using BackEnd.Entities;
+﻿using BackEnd.DTOs.Response;
+using BackEnd.Entities;
 using BackEnd.Models;
 using BackEnd.Services;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
-using System;
+using System.Collections.Generic;
 
 namespace BackEnd.Controllers
 {
@@ -18,26 +19,31 @@ namespace BackEnd.Controllers
             _userService = userService;
         }
 
-        //[HttpGet(Name = "GetUsers")]
-        //public ActionResult<IEnumerable<User>> Get() => Ok(_userService.Get());
+        [HttpGet(Name = "GetUsers")]
+        public ActionResult<IEnumerable<UserResponse>> Get()
+        {
+            var users = _userService.Get();
+
+            return Ok(users);
+        }
 
         [HttpGet("{id}", Name = "GetUser")]
-        public ActionResult<User> Get(Guid id)
+        public ActionResult<UserResponse> Get(string id)
 
         {
-            //var user = _userService.Get(id);
-            //if (user is not null)
-            //{
-            //    return user;
-            //}
+            var user = _userService.Get(id);
+            if (user is not null)
+            {
+                return Ok(user);
+            }
             return NotFound();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(Guid id)
+        public IActionResult Delete(string id)
         {
-            //_userService.Remove(id);
-            return Ok();
+            var result = _userService.Delete(id);
+            return Ok(result);
         }
 
         [HttpPut]
@@ -56,10 +62,10 @@ namespace BackEnd.Controllers
         }
 
         [HttpPatch("{id}")]
-        public IActionResult Update(Guid id, UserRequest request)
+        public IActionResult Update(string id, UserRequest request)
         {
-            // _userService.Update(id, new User { Name = request.Name, Surname = request.Surname, Password = request.Password });
-            return Ok();
+            var result = _userService.Update(id, request);
+            return Ok(result);
         }
     }
 }
