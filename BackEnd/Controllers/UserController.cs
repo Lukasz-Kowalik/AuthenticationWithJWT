@@ -5,6 +5,7 @@ using BackEnd.Services;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BackEnd.Controllers
 {
@@ -19,7 +20,7 @@ namespace BackEnd.Controllers
             _userService = userService;
         }
 
-        [HttpGet(Name = "GetUsers")]
+        [HttpGet]
         public ActionResult<IEnumerable<UserResponse>> Get()
         {
             var users = _userService.Get();
@@ -46,7 +47,7 @@ namespace BackEnd.Controllers
             return Ok(result);
         }
 
-        [HttpPut]
+        [HttpPost]
         public ActionResult<ObjectId> Create(UserRequest userRequest)
         {
             var user = new User
@@ -61,11 +62,18 @@ namespace BackEnd.Controllers
             return Ok(result);
         }
 
-        [HttpPatch("{id}")]
+        [HttpPut("{id}")]
         public IActionResult Update(string id, UserRequest request)
         {
             var result = _userService.Update(id, request);
             return Ok(result);
+        }
+
+        [HttpPost(template: "SignIn")]
+        public async Task<IActionResult> SignInAsync(string email, string password)
+        {
+            var response = await _userService.SignInAsync(email, password);
+            return Ok(response);
         }
     }
 }

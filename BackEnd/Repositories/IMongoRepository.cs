@@ -14,6 +14,10 @@ namespace BackEnd.Generics
 
         Task<T> GetByIdAsync(string id);
 
+        T Get(Expression<Func<T, bool>> expression);
+
+        Task<T> GetAsync(Expression<Func<T, bool>> expression);
+
         void Insert(T obj);
 
         void Update(T obj);

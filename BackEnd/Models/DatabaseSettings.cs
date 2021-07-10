@@ -2,21 +2,11 @@
 {
     public class DatabaseSettings : IDatabaseSettings
     {
-        public string UsersCollectionName { get; set; }
-        public string TokensCollectionName { get; set; }
-        public string ConnectionString { get; set; }
-        public string DatabaseName { get; set; }
-        public string UserName { get; set; }
-        public string Password { get; set; }
-    }
-
-    public interface IDatabaseSettings
-    {
-        string UsersCollectionName { get; set; }
-        string TokensCollectionName { get; set; }
-        string ConnectionString { get; set; }
-        string DatabaseName { get; set; }
-        string UserName { get; set; }
-        string Password { get; set; }
+        public string UsersCollectionName { get; init; }
+        public string TokensCollectionName { get; init; }
+        public string ConnectionString { get; init; }
+        public string DatabaseName { get; init; }
+        public string UserName { get; init; }
+        public string Password { get; init; }
     }
 }

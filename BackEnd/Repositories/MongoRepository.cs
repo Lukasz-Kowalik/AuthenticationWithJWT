@@ -44,6 +44,16 @@ namespace BackEnd.Generics
             return _collection.Find(x => x.Id == new ObjectId(id)).FirstOrDefault();
         }
 
+        public virtual T Get(Expression<Func<T, bool>> expression)
+        {
+            return _collection.Find(expression).FirstOrDefault();
+        }
+
+        public virtual Task<T> GetAsync(Expression<Func<T, bool>> expression)
+        {
+            return Task.Run(() => _collection.Find(expression).FirstOrDefault());
+        }
+
         public virtual Task<T> GetByIdAsync(string id)
         {
             return Task.Run(() =>

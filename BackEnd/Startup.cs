@@ -1,4 +1,6 @@
+using BackEnd.Entities;
 using BackEnd.Generics;
+using BackEnd.Managers;
 using BackEnd.Models;
 using BackEnd.Services;
 using Microsoft.AspNetCore.Builder;
@@ -31,7 +33,14 @@ namespace BackEnd
             services.AddSingleton<IDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<DatabaseSettings>>().Value);
 
+            services.Configure<TokenSettings>(
+            Configuration.GetSection(nameof(TokenSettings)));
+
+            services.AddSingleton<ITokenSettings>(ts =>
+                ts.GetRequiredService<IOptions<TokenSettings>>().Value);
+
             services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
+            services.AddScoped<IJwtManager, JwtManager>();
             services.AddScoped<IUserService, UserService>();
 
             services.AddControllers();

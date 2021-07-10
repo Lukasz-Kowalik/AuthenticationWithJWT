@@ -2,6 +2,7 @@
 using BackEnd.Entities;
 using BackEnd.Models;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BackEnd.Services
 {
@@ -16,5 +17,7 @@ namespace BackEnd.Services
         bool Delete(string id);
 
         IEnumerable<UserResponse> Get();
+
+        Task<string> SignInAsync(string email, string password);
     }
 }
