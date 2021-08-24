@@ -1,11 +1,12 @@
 ﻿using BackEnd.DTOs.Response;
 using BackEnd.Entities;
+using BackEnd.Enums;
 using BackEnd.Models;
 using BackEnd.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace BackEnd.Controllers
 {
@@ -28,9 +29,12 @@ namespace BackEnd.Controllers
             return Ok(users);
         }
 
+        [Authorize(Policy = nameof(Policies.Default))]
         [HttpGet("{id}", Name = "GetUser")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
         public ActionResult<UserResponse> Get(string id)
-
         {
             var user = _userService.Get(id);
             if (user is not null)
@@ -41,6 +45,9 @@ namespace BackEnd.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = nameof(Policies.Default))]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
         public IActionResult Delete(string id)
         {
             var result = _userService.Delete(id);
@@ -55,7 +62,8 @@ namespace BackEnd.Controllers
                 Name = userRequest.Name,
                 Email = userRequest.Email,
                 Surname = userRequest.Surname,
-                Password = userRequest.Password
+                Password = userRequest.Password,
+                Token = new Token()
             };
 
             var result = _userService.Create(user);
@@ -63,17 +71,13 @@ namespace BackEnd.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Policy = nameof(Policies.Default))]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
         public IActionResult Update(string id, UserRequest request)
         {
             var result = _userService.Update(id, request);
             return Ok(result);
-        }
-
-        [HttpPost(template: "SignIn")]
-        public async Task<IActionResult> SignInAsync(string email, string password)
-        {
-            var response = await _userService.SignInAsync(email, password);
-            return Ok(response);
         }
     }
 }

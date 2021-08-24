@@ -1,9 +1,12 @@
 ﻿using BackEnd.Entities;
+using System.Threading.Tasks;
 
 namespace BackEnd.Managers
 {
     public interface IJwtManager
     {
-        string GenerateTocken(User user);
+        Task<Token> SignInAsync(string email, string password);
+
+        Token RefreshToken(string token, string refreshToken);
     }
 }

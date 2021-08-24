@@ -1,24 +1,20 @@
 ﻿using BackEnd.DTOs.Response;
 using BackEnd.Entities;
 using BackEnd.Generics;
-using BackEnd.Managers;
 using BackEnd.Models;
 using MongoDB.Bson;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackEnd.Services
 {
     public class UserService : IUserService
     {
         private readonly IMongoRepository<User> _userRepository;
-        private readonly IJwtManager _jwtManager;
 
-        public UserService(IMongoRepository<User> userRepository, IJwtManager jwtManager)
+        public UserService(IMongoRepository<User> userRepository)
         {
             _userRepository = userRepository;
-            _jwtManager = jwtManager;
         }
 
         public bool Create(User user)
@@ -88,15 +84,6 @@ namespace BackEnd.Services
                 Name = x.Name,
                 Surname = x.Surname
             });
-        }
-
-        public async Task<string> SignInAsync(string email, string password)
-        {
-            var user = await _userRepository.GetAsync(x => x.Email.Equals(email)
-            && x.Password.Equals(password));
-            if (user is null) return null;
-
-            return _jwtManager.GenerateTocken(user);
         }
     }
 }

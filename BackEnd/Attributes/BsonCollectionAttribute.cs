@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BackEnd.Helpers
+namespace BackEnd.Attributes
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class BsonCollectionAttribute : Attribute

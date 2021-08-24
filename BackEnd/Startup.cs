@@ -1,15 +1,19 @@
 using BackEnd.Entities;
+using BackEnd.Enums;
 using BackEnd.Generics;
 using BackEnd.Managers;
 using BackEnd.Models;
 using BackEnd.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System;
 
 namespace BackEnd
 {
@@ -22,7 +26,6 @@ namespace BackEnd
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddOptions();
@@ -40,13 +43,62 @@ namespace BackEnd
                 ts.GetRequiredService<IOptions<TokenSettings>>().Value);
 
             services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
-            services.AddScoped<IJwtManager, JwtManager>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IJwtManager, JwtManager>();
+
+            JwtBearerOptions options(JwtBearerOptions jwtBearerOptions, string audience)
+            {
+                jwtBearerOptions.RequireHttpsMetadata = false;
+                jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateAudience = false,
+                    ValidateIssuer = false,
+                    RequireExpirationTime = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["TokenSettings:Secret"]))
+                };
+
+                return jwtBearerOptions;
+            }
+            services.AddAuthentication(x =>
+           {
+               x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+           }).AddJwtBearer(jwtBearerOptions => options(jwtBearerOptions, "access"));
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(nameof(Policies.Default), policy =>
+                 {
+                     policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
+                     policy.RequireAuthenticatedUser();
+                 });
+            });
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "BackEnd", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please insert JWT with Bearer into field",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                    },
+                    new string[] { }
+                }
+                });
             });
         }
 
